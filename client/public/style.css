@@ -1,0 +1,123 @@
+* {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: #343434;
+}
+
+body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #eaeaea;
+}
+
+.container {
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+header {
+    height: 50px;
+    background-color: #fff;
+    width: 100%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+header ul {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 250px;
+}
+
+main {
+    width: 100%;
+    margin-top: 50px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+main div {
+    text-align: left;
+    margin-bottom: 20px;
+    border-bottom: solid 1px #f1f1f1f1;
+    box-sizing: border-box;
+    padding: 20px;
+}
+main > * {
+    width: 100%;
+}
+
+main div:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+form {
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+form > * {
+    width: 200px;
+    height: 50px;
+    margin-bottom: 30px;
+}
+.controlPanel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.controlPanel button {
+    padding: 10px 20px;
+    border: none;
+    background: dodgerblue;
+    color: #fff;
+    cursor: pointer;
+    margin-right: 20px;
+}
+.controlPanel button:hover {
+    background: #1d66cb;
+}
+.register {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px auto;
+    width: 200px;
+    height: 50px;
+    background: dodgerblue;
+    color: #fff;
+}
+
+textarea {
+    resize: vertical;
+}
