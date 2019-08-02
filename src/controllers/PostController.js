@@ -11,7 +11,7 @@ export default class PostController {
     createPost(req, res) {
         const {title, body} = req.body;
         const post = new PostModel({title, body, description: body.substr(0, 100)});
-        post.save().then(() => {res.send({status: "ok"})});
+        post.save().then(() => {res.send({post})});
     }
     readPost(req, res) {
         PostModel.findOne({_id: req.params.id})

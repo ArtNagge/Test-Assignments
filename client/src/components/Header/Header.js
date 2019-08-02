@@ -1,29 +1,41 @@
 import React from 'react';
 import { Link } from "react-router-dom";
+import {logoutUser} from '../../actions/infoUserActions';
 import {withCookies} from 'react-cookie'
+import {connect} from "react-redux";
 
 const Header = (props) => {
 
     const {isAuth} = props;
 
+    const logout = () => {
+        props.cookies.remove('info');
+        props.logoutUser();
+    };
+
     const isAuthorize = (auth) => {
         return auth ? (
             <>
-                <Link to='/create'>CREATE POST</Link>
-                <a href={'/'} onClick={async () => await props.cookies.remove('info')}>QUIT</a>
+                <Link className="p-2 text-dark" to="/create">Создать пост</Link>
+                <Link className="p-2 text-dark" to="/" onClick={logout}>Выйти</Link>
             </>
-        ) : <Link to='/login'>LOGIN</Link>;
+        ) : <Link className="p-2 text-dark" to='/login'>Войти</Link>;
     };
 
     return(
-        <header>
-            <h2>Yan test page</h2>
-            <ul>
-                <Link to='/'>HOME</Link>
+
+        <div className="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+            <h5 className="my-0 mr-md-auto font-weight-normal">Yan test page</h5>
+            <nav className="my-2 my-md-0 mr-md-3">
+                <Link className="p-2 text-dark" to="/">Главная</Link>
                 { isAuthorize(isAuth) }
-            </ul>
-        </header>
+            </nav>
+        </div>
     )
 };
 
-export default withCookies(Header);
+const mapStateToProps = ({isAuth}) => {
+    return {isAuth}
+};
+
+export default connect(mapStateToProps, {logoutUser})(withCookies(Header));

@@ -36,7 +36,7 @@ var PostController = function () {
 
             var post = new _Post2.default({ title: title, body: body, description: body.substr(0, 100) });
             post.save().then(function () {
-                res.send({ status: "ok" });
+                res.send({ post: post });
             });
         }
     }, {

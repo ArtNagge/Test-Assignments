@@ -1,46 +1,64 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 import {connect} from "react-redux";
 import {loginUser} from '../../actions/infoUserActions';
 import ApiWorker from '../../api/apiWorker';
 import { withCookies } from 'react-cookie';
-import { Link } from "react-router-dom";
+import { Link, Redirect } from 'react-router-dom';
 
 const api = new ApiWorker();
 
-class Form extends Component {
+function Form(props) {
 
-    state = {
-        email: '',
-        pass: ''
-    };
+    const [email, setEmail] = useState('');
+    const [pass, setPass] = useState('');
 
-    handleChange = (evt) => {
+    const handleChange = (evt) => {
         let name = evt.target.name;
-        this.setState({[name]: evt.target.value})
+        switch (name) {
+            case "email":
+                setEmail(evt.target.value);
+                break;
+            case "pass":
+                setPass(evt.target.value);
+                break;
+            default:
+                return null
+        }
     };
 
-    handleSubmit = (evt) => {
+    const handleSubmit = (evt) => {
         evt.preventDefault();
-        api.getInfoPlayer(this.state.email, this.state.pass)
-            .then(r => {
-                this.props.loginUser(r);
-                this.props.cookies.set('info', {login: r.login, token: r.token}, { path: '/', httpOnly: false, maxAge: 3600 * 24 * 7 });
-                window.location.reload();
+        api.getInfoPlayer(email, pass)
+            .then( r => {
+                props.loginUser(r);
+                props.cookies.set('info', {login: r.login, token: r.token}, { path: '/', httpOnly: false, maxAge: 3600 * 24 * 7 })
             });
     };
 
-    render() {
-        return(
-            <>
-                <form onSubmit={this.handleSubmit}>
-                    <input type="text" value={this.state.email} onChange={this.handleChange} name="email" placeholder="Логин" />
-                    <textarea value={this.state.pass} onChange={this.handleChange} name="pass" placeholder="Пароль" />
-                    <input type="submit" value="Авторизироваться" />
-                </form>
-                <Link className={'register'} to={'/register'}>Зарегистрироваться</Link>
-            </>
-        )
-    }
+    const hasDel = () => {
+        return props.isAuth ? <Redirect to="/"/> : null
+    };
 
+    return(
+        <form onSubmit={handleSubmit}>
+            {hasDel()}
+            <div className="form-group">
+                <label htmlFor="exampleInputEmail">E-mail</label>
+                <input type="text" name="email" required onChange={handleChange} className="form-control" id="exampleInputEmail" value={email}/>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="exampleInputPassword">Пароль</label>
+                <input type="password" name="pass" required onChange={handleChange} className="form-control" id="exampleInputPassword" value={pass}/>
+            </div>
+            <button type="submit" className="btn btn-primary">Авторизироваться</button>
+            <Link to='/register' className="btn btn-outline-primary ml-2">Зарегистрироваться</Link>
+        </form>
+    )
 }
-export default connect(null, {loginUser})(withCookies(Form));
+
+const mapStateToProps = ({isAuth}) => {
+    return {isAuth}
+};
+
+export default connect(mapStateToProps, {loginUser})(withCookies(Form));

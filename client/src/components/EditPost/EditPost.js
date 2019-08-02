@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import ApiWorker from '../../api/apiWorker';
 import {connect} from "react-redux";
-const api = new ApiWorker();
+import {editPost} from '../../actions/postNewsAction';
+import {Redirect} from 'react-router-dom';
 
 class EditPost extends Component {
     state = {
@@ -11,8 +11,18 @@ class EditPost extends Component {
     };
 
     componentDidMount() {
-        api.getFullPost(this.props.match.params.id)
-            .then(r => this.setState(r));
+        this.mount();
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        this.mount(prevProps);
+    }
+
+    mount(prevProps) {
+        const {post} = this.props;
+        if (prevProps && prevProps.post === post) return false;
+        this.setState(post);
+
     }
 
     handleChange = (evt) => {
@@ -22,26 +32,39 @@ class EditPost extends Component {
 
     handleSubmit = (evt) => {
         evt.preventDefault();
-        api.editPost(this.state._id, this.state.title, this.state.body, this.props.token)
-            .then((r) => console.log(r))
-            .then(() => alert('edited'))
-            .then(() =>
-                window.location.reload());
+        this.props.editPost(this.state, this.props.token);
     };
+
+    hasDel() {
+        return !this.props.isAuth ? <Redirect to="/"/> : null
+    }
 
     render() {
         return(
-            <main>
-                <div>
-                    <form onSubmit={this.handleSubmit}>
-                        <input type="text" name='title' placeholder='Заголовок' onChange={this.handleChange} value={this.state.title}/>
-                        <input type="text" name='body' placeholder='Информация' onChange={this.handleChange} value={this.state.body}/>
-                        <input type="submit" value='Отредактировать'/>
-                    </form>
+            <form onSubmit={this.handleSubmit}>
+                {this.hasDel()}
+                <button className='btn btn-dark mb-5 mt-3' onClick={this.props.history.goBack}>Вернутся назад</button>
+                <div className="form-group">
+                    <label htmlFor="exampleInputEmail1">Заголовок</label>
+                    <input type="text" name="title" onChange={this.handleChange} className="form-control" id="exampleInputEmail1" placeholder="Введите заголовок" value={this.state.title}/>
                 </div>
-            </main>
+
+                <div className="form-group">
+                    <label htmlFor="exampleFormControlTextarea1">Информация</label>
+                    <textarea name='body' value={this.state.body} onChange={this.handleChange} className="form-control" id="exampleFormControlTextarea1" rows="3"/>
+                </div>
+                <button type="submit" className="btn btn-primary">Отредактировать</button>
+            </form>
         );
     }
 }
 
-export default connect(({token}) => {return {token}})(EditPost);
+const mapStateToProps = ({token, posts, isAuth}, ownProps) => {
+    const id = ownProps.match.params.id;
+    return {
+        token,
+        post: posts.find(({_id}) => _id === id),
+        isAuth}
+};
+
+export default connect(mapStateToProps, {editPost})(EditPost);

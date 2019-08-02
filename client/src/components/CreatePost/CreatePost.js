@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import ApiWorker from '../../api/apiWorker';
 import {connect} from "react-redux";
-const api = new ApiWorker();
+import {addPost} from '../../actions/postNewsAction';
+import {Redirect} from 'react-router-dom';
 
 class CreatePost extends Component {
     state = {
@@ -16,25 +16,35 @@ class CreatePost extends Component {
 
     handleSubmit = (evt) => {
         evt.preventDefault();
-        api.createPost(this.state.title, this.state.body, this.props.token)
-            .then(r => console.log(r))
-            .then(() => alert('created'))
-            .then(() => this.setState({title: '', body: ''}));
+        this.props.addPost(this.state, this.props.token);
+        this.setState({title: '', body: ''});
     };
+
+    hasDel() {
+        return !this.props.isAuth ? <Redirect to="/"/> : null
+    }
 
     render() {
         return(
-            <main>
-                <div>
-                    <form onSubmit={this.handleSubmit}>
-                        <input type="text" name='title' placeholder='Заголовок' onChange={this.handleChange} value={this.state.title}/>
-                        <textarea name='body' placeholder='Информация' onChange={this.handleChange} value={this.state.body}/>
-                        <input type="submit" value='Создать'/>
-                    </form>
+            <form onSubmit={this.handleSubmit}>
+                {this.hasDel()}
+                <div className="form-group">
+                    <label htmlFor="exampleInputEmail1">Заголовок</label>
+                    <input type="text" name="title" onChange={this.handleChange} className="form-control" id="exampleInputEmail1" placeholder="Введите заголовок" value={this.state.title}/>
                 </div>
-            </main>
+
+                <div className="form-group">
+                    <label htmlFor="exampleFormControlTextarea1">Информация</label>
+                    <textarea name='body' value={this.state.body} onChange={this.handleChange} className="form-control" id="exampleFormControlTextarea1" rows="3"/>
+                </div>
+                <button type="submit" className="btn btn-primary">Создать</button>
+            </form>
         );
     }
 }
 
-export default connect(({token}) => {return {token}})(CreatePost);
+const mapStateToProps = ({token, isAuth}) => {
+    return {token, isAuth};
+};
+
+export default connect(mapStateToProps, {addPost})(CreatePost);

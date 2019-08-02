@@ -5,7 +5,7 @@ export default class HomePage extends Component{
     render() {
         return(
             <main>
-                <Content/>
+                <Content posts={this.props.posts}/>
             </main>
         )
     }

@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import ApiWorker from '../api/apiWorker';
 import {loginUser} from '../actions/infoUserActions';
 import { withCookies } from 'react-cookie';
+import {Link, Redirect} from "react-router-dom";
 
 const api = new ApiWorker();
 
@@ -23,25 +24,43 @@ class RegPage extends Component {
         evt.preventDefault();
         api.registerUser(this.state.login, this.state.email, this.state.pass)
             .then(r => {
-                console.log(r);
                 this.props.loginUser(r);
                 this.props.cookies.set('info', {login: r.login, token: r.token}, { path: '/', httpOnly: false, maxAge: 3600 * 24 * 7 });
-                window.location.reload();
             });
     };
 
+    hasDel() {
+        return this.props.isAuth ? <Redirect to="/"/> : null
+    }
+
     render() {
         return(
-            <main>
-                <form onSubmit={this.handleSubmit}>
-                    <input type="text" value={this.state.login} onChange={this.handleChange} name="login" placeholder="Логин" />
-                    <input type="text" value={this.state.email} onChange={this.handleChange} name="email" placeholder="email" />
-                    <input type="text" value={this.state.pass} onChange={this.handleChange} name="pass" placeholder="Пароль" />
-                    <input type="submit" value="Send Request" />
-                </form>
-            </main>
+            <form onSubmit={this.handleSubmit}>
+                {this.hasDel()}
+                <div className="form-group">
+                    <label htmlFor="exampleInputEmail">E-mail</label>
+                    <input type="text" name="email" required onChange={this.handleChange} className="form-control" id="exampleInputEmail" value={this.state.email}/>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="exampleInputLogin">Логин</label>
+                    <input type="text" name="login" required onChange={this.handleChange} className="form-control" id="exampleInputLogin" value={this.state.login}/>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="exampleInputPassword">Пароль</label>
+                    <input type="password" name="pass" required onChange={this.handleChange} className="form-control" id="exampleInputPassword" value={this.state.pass}/>
+                </div>
+                <button type="submit" className="btn btn-primary">Зарегистрироваться</button>
+                <Link to='/login' className="btn btn-outline-primary ml-2">Авторизация</Link>
+            </form>
         )
     }
 
 }
-export default connect(null, {loginUser})(withCookies(RegPage));
+
+const mapStateToProps = ({isAuth}) => {
+    return {isAuth}
+};
+
+export default connect(mapStateToProps, {loginUser})(withCookies(RegPage));

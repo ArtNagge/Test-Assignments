@@ -24,10 +24,6 @@ var _Auth = require('./middleware/Auth');
 
 var _Auth2 = _interopRequireDefault(_Auth);
 
-var _cookieParser = require('cookie-parser');
-
-var _cookieParser2 = _interopRequireDefault(_cookieParser);
-
 var _UserController = require('./controllers/UserController');
 
 var _UserController2 = _interopRequireDefault(_UserController);
@@ -39,8 +35,8 @@ var _PostController2 = _interopRequireDefault(_PostController);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // controllers
-var User = new _UserController2.default(); // imports
-
+// imports
+var User = new _UserController2.default();
 var Post = new _PostController2.default();
 
 var app = (0, _express2.default)();
@@ -50,7 +46,6 @@ app.use((0, _cors2.default)());
 _mongoose2.default.connect(_config2.default.DB_LINK, { useNewUrlParser: true });
 app.use(_bodyParser2.default.urlencoded({ extended: true }));
 app.use(_bodyParser2.default.json());
-app.use((0, _cookieParser2.default)());
 
 // routs
 app.post('/api/signup', User.singUp);

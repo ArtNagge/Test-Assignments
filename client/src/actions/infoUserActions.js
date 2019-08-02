@@ -5,6 +5,11 @@ const loginUser = (payload) => {
     }
 };
 
+const logoutUser = () => {
+    return {type: 'POST:LOGOUT_USER'}
+};
+
 export {
+    logoutUser,
     loginUser
 };

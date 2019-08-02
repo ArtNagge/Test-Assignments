@@ -1,57 +1,54 @@
 import React, {Component} from 'react';
-
 import Header from "./Header";
 import AuthPage from "../Pages/AuthPage";
 import HomePage from "../Pages/HomePage";
-
-import { withCookies } from 'react-cookie';
-import {loginUser} from '../actions/infoUserActions';
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
-import {connect} from "react-redux";
 import FullPost from "./FullPost";
 import CreatePost from "./CreatePost";
 import RegPage from "../Pages/RegPage";
 import EditPost from "./EditPost";
+import { withCookies } from 'react-cookie';
+import {loginUser} from '../actions/infoUserActions';
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import {connect} from "react-redux";
+import {setPostsList} from '../actions/postNewsAction';
 
 class App extends Component {
-    state = {isAuth: false};
 
     componentDidMount() {
-        const {cookies, loginUser} = this.props;
+        const {cookies, loginUser, posts, setPostsList} = this.props;
+        if(cookies.get('info')) loginUser(cookies.get('info'));
+        if (!posts.length) setPostsList();
+        console.log('App', 'mounted')
+    }
 
-        if(cookies.get('info')) {
-            this.setState({isAuth: true});
-            loginUser(cookies.get('info'))
-        }
+    componentDidUpdate() {
+        console.log('App', 'update');
     }
 
     render() {
-        const {isAuth} = this.state;
         return(
             <div className={'container'}>
-                <Router>
-                    <Header isAuth={isAuth}/>
-                    <Route path={'/'} exact component={HomePage}/>
-                    <Route path={'/post/:id'} render={routeProps => <FullPost isAuth={isAuth} {...routeProps}/>}/>
+                <div className="column align-items-start justify-content-center">
+                    <Router>
+                        <Header/>
 
+                        <Route path={'/'} exact component={(routeProps) => <HomePage posts={this.props.posts} {...routeProps}/>}/>
 
-                    <Route path={'/create'} render={() => (isAuth ? (<CreatePost/>) : (<Redirect to="/"/>))}/>
-                    <Route path={'/edit/:id'} render={(routeProps) => (isAuth ? (<EditPost {...routeProps}/>) : (<Redirect to="/"/>))}/>
-                    {
-                        //Тут имеется маленький косяк
-                        //Как его решить, я пока способа не нашел, но пытаюсь
-                        //При монтировании компонента нам прилетает "isAuth: false" и он мгновенно считывает роутинг тем самым делает редирект
-                        //Если переходить на эту страницу не сразу по ссылке, а лишь посредством роутинга, то все отрабатывает так, как нужно
-                    }
-                    <Route path="/login" render={() => (!isAuth ? (<AuthPage/>) : (<Redirect to="/"/>))}/>
-                    <Route path="/register" render={() => (!isAuth ? (<RegPage/>) : (<Redirect to="/"/>))}/>
-                    {
-                        //Тут аналогичная ситуация, но вроде как работает
-                    }
-                </Router>
+                        <Route path={'/post/:id'} component={FullPost}/>
+                        <Route path={'/create'} component={CreatePost}/>
+                        <Route path={'/edit/:id'} component={EditPost}/>
+
+                        <Route path="/login" component={AuthPage}/>
+                        <Route path="/register" component={RegPage}/>
+                    </Router>
+                </div>
             </div>
         )
     }
 }
 
-export default connect(null, {loginUser})(withCookies(App));
+const mapStateToProps = ({posts}) => {
+    return {posts}
+};
+
+export default connect(mapStateToProps, {loginUser, setPostsList})(withCookies(App));
